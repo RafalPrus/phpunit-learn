@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Test\Unit;
 
+use App\Exceptions\RouteNotFoundException;
 use App\Router;
 use PHPUnit\Framework\TestCase;
 
@@ -66,8 +67,39 @@ class RouterTest extends TestCase
     /** @test */
     public function thereAreNoRoutesWhenRouterIsCreated(): void
     {
-        $router = new Router(); // new instation of Router because of test spec
+        // new instation of Router because of test spec
+        $this->router = new Router();
 
-        $this->assertEmpty($router->routes());
+        $this->assertEmpty($this->router->routes());
+    }
+
+    /**
+     * @test
+     * @dataProvider routeNotFoundCases
+     */
+    public function itThrowsFileNotFoundException(string $requestUri, string $requestMethod)
+    {
+        $users = new class() {
+            public function delete(): bool
+            {
+                return true;
+            }
+        };
+        $this->router->post('/users', [$users::class, 'store']);
+        $this->router->get('/users', ['Users', 'index']);
+
+
+        $this->expectException(RouteNotFoundException::class);
+        $this->router->resolve($requestUri, $requestMethod);
+    }
+
+    public function routeNotFoundCases(): array
+    {
+        return [
+            ['/users', 'patch'],
+            ['/invoices', 'post'],
+            ['/users', 'get'],
+            ['/users', 'post']
+        ];
     }
 }

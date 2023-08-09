@@ -27,4 +27,48 @@ class RouterTest extends TestCase
         // then we assert route
         $this->assertEquals($expected, $router->routes());
     }
+
+    /** @test */
+    public function itRegisterAGetRoute(): void
+    {
+        $router = new Router();
+
+
+        $router->get('/users', ['Users', 'index']);
+
+        $expected = [
+            'get' => [
+                '/users' => ['Users', 'index']
+            ]
+        ];
+
+
+        $this->assertEquals($expected, $router->routes());
+    }
+
+    /** @test */
+    public function itRegisterAPostRoute(): void
+    {
+        $router = new Router();
+
+
+        $router->post('/users', ['Users', 'store']);
+
+        $expected = [
+            'post' => [
+                '/users' => ['Users', 'store']
+            ]
+        ];
+
+
+        $this->assertEquals($expected, $router->routes());
+    }
+
+    /** @test */
+    public function thereAreNoRoutesWhenRouterIsCreated(): void
+    {
+        $router = new Router();
+
+        $this->assertEmpty($router->routes());
+    }
 }
